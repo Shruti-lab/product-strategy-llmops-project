@@ -1,3 +1,5 @@
+"""This file contains the main application entry point."""
+
 from contextlib import asynccontextmanager
 from datetime import datetime
 
@@ -15,8 +17,14 @@ from asgi_correlation_id import CorrelationIdMiddleware
 
 from app.core.logging import logger
 from app.core.config import settings
-from app.api.v1.api import router
+from app.api.v1.api import api_router
 from app.api.v1.llm import agent
+from app.core.metrics import setup_metrics
+from app.core.middleware import (
+    LoggingContextMiddleware,
+    MetricsMiddleware,
+    ProfilingMiddleware,
+)
 
 load_dotenv()
 
@@ -32,10 +40,12 @@ async def lifespan(app: FastAPI):
     )
 
     try:
-        await agent.create_graph()
+        # await agent.create_graph()
         logger.info("graph_pre_warmed")
     except Exception as e:
         logger.exception("graph_pre_warm_failed", error=str(e))
 
     yield
-app = FastAPI(lifespan=lifespan
+app = FastAPI(lifespan=lifespan)
+
+)   
