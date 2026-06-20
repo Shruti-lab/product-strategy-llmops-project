@@ -1,6 +1,7 @@
 .bob
 
 rough.txt
+middleware_rough.txt
 
 __pycache__/
 *.py[oc]
