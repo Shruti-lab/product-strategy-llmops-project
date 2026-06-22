@@ -3,6 +3,7 @@
 from contextlib import asynccontextmanager
 # Used to create startup/shutdown lifecycle hooks.
 from datetime import datetime
+from typing import Any
 
 from dotenv import load_dotenv
 from fastapi import (FastAPI, Request, status)
@@ -53,8 +54,10 @@ from app.core.middleware import (
     ProfilingMiddleware,
 )
 from app.core.observability import langfuse_init
-from app.services.database import database_service
+from app.services.dependencies import db_dependency
 from app.services.memory import memory_service
+
+from sqlalchemy import text
 
 
 load_dotenv()
@@ -180,7 +183,7 @@ async def root(request: Request):
 
 @app.get("/health")
 @limiter.limit(settings.RATE_LIMIT_ENDPOINTS["health"][0])
-async def health_check(request: Request) -> JSONResponse:
+async def health_check(db: db_dependency) -> JSONResponse:
     """Health check endpoint with environment-specific information.
 
     Returns:
@@ -190,18 +193,15 @@ async def health_check(request: Request) -> JSONResponse:
     logger.info("health_check_called")
 
     # Check database connectivity
-    db_healthy = await database_service.health_check()
-
-    response = {
-        "status": "healthy" if db_healthy else "degraded",
-        "version": settings.VERSION,
-        "environment": settings.ENVIRONMENT.value,
-        "components": {"api": "healthy", "database": "healthy" if db_healthy else "unhealthy"},
-        "timestamp": datetime.now().isoformat(),
-    }
-
-    # Check database connectivity
-    db_healthy = await database_service.health_check()
+    try:
+        db.execute(text("SELECT 1"))
+        db_healthy = True
+    except Exception as e:
+        logger.error(
+            "database_health_check_failed",
+            error=str(e),
+        )
+        db_healthy = False
 
     response = {
         "status": "healthy" if db_healthy else "degraded",
