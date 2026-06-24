@@ -102,6 +102,10 @@ app = FastAPI(
 )
 
 
+# Set up Prometheus metrics
+setup_metrics(app)
+
+
 # Add logging context middleware (must be added before other middleware to capture context)
 app.add_middleware(LoggingContextMiddleware)
 
