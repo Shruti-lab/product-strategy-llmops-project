@@ -8,7 +8,6 @@ from app.core.config import (
     Environment,
     settings,
 )
-from app.models.user import User
 from app.core.logging import logger
 
 try:
@@ -31,7 +30,7 @@ try:
     
     Base = declarative_base()
     Base.metadata.create_all(bind=engine)
-    logger.info("database_initialized", environment=settings.ENVIRONMENT.value)
+    logger.info("database_initialized. Base ORM created", environment=settings.ENVIRONMENT.value)
         
 
 except SQLAlchemyError as e:

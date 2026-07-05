@@ -22,6 +22,8 @@ from fastapi.security import (
 )
 from fastapi.security import  OAuth2PasswordRequestForm
 from starlette import status
+from app.core.limiter import limiter
+from app.core.config import settings
 
 from app.schemas.user import UserCreate, TokenData
 from app.services.user_db import create_user, authenticate_user, create_access_token
@@ -32,7 +34,8 @@ router = APIRouter(prefix='/auth', tags=["auth"])
 
 
 @router.post("/signup")
-def signup(user: UserCreate,db: db_dependency):
+@limiter.limit(settings.RATE_LIMIT_ENDPOINTS["signup"][0])
+def signup(request: Request,user: UserCreate,db: db_dependency):
     return create_user(
         db=db,
         email=user.email,
@@ -42,7 +45,8 @@ def signup(user: UserCreate,db: db_dependency):
 
 
 @router.post('/login',response_model=TokenData)
-def signin(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency):
+@limiter.limit(settings.RATE_LIMIT_ENDPOINTS["login"][0])
+def signin(request: Request,form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency):
     """
     Authenticates user credentials and returns a JWT token if valid.
     """

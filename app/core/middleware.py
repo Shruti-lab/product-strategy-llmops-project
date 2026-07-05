@@ -46,6 +46,45 @@ else:
         PYINSTRUMENT_AVAILABLE = False
 
 
+# Python
+from typing import Callable
+import time
+from starlette.requests import Request
+from starlette.responses import Response
+from starlette.routing import Match
+from starlette.middleware.base import BaseHTTPMiddleware
+
+# class MetricsMiddleware(BaseHTTPMiddleware):
+#     async def dispatch(self, request: Request, call_next: Callable) -> Response:
+#         start_time = time.time()
+#         status_code = 500
+
+#         # Try to resolve the route template BEFORE calling the app
+#         endpoint = request.url.path
+#         try:
+#             for route in request.app.routes:
+#                 match, _ = route.matches(request.scope)
+#                 if match == Match.FULL:
+#                     endpoint = getattr(route, "path", request.url.path)
+#                     break
+#         except Exception:
+#             # defensive fallback to raw path
+#             endpoint = request.url.path
+
+#         try:
+#             response = await call_next(request)
+#             status_code = response.status_code
+#         except Exception:
+#             raise
+#         finally:
+#             duration = time.time() - start_time
+
+#             # Record metrics using the resolved endpoint/template
+#             http_requests_total.labels(method=request.method, endpoint=endpoint, status=status_code).inc()
+#             http_request_duration_seconds.labels(method=request.method, endpoint=endpoint).observe(duration)
+
+#         return response
+
 class MetricsMiddleware(BaseHTTPMiddleware):
     """Middleware for tracking HTTP request metrics."""
 
@@ -60,6 +99,13 @@ class MetricsMiddleware(BaseHTTPMiddleware):
         Returns:
             Response: The response from the application
         """
+        # Skip metrics endpoint
+        if request.url.path == '/metrics':
+            return await call_next(request)
+
+        method = request.method
+        endpoint = request.url.path
+
         start_time = time.time()
         status_code = 500
 
@@ -72,9 +118,9 @@ class MetricsMiddleware(BaseHTTPMiddleware):
             duration = time.time() - start_time
 
             # Record metrics
-            http_requests_total.labels(method=request.method, endpoint=request.url.path, status=status_code).inc()
+            http_requests_total.labels(method=method, endpoint=endpoint, status=status_code).inc()
 
-            http_request_duration_seconds.labels(method=request.method, endpoint=request.url.path).observe(duration)
+            http_request_duration_seconds.labels(method=method, endpoint=endpoint).observe(duration)
 
         return response
 

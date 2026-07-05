@@ -55,7 +55,6 @@ from app.core.middleware import (
 )
 from app.core.observability import langfuse_init
 from app.services.dependencies import db_dependency
-from app.services.memory import memory_service
 
 from sqlalchemy import text
 
@@ -75,19 +74,19 @@ async def lifespan(app: FastAPI):
     )
 
     try:
-        # await agent.create_graph()
+        await agent.create_graph()
         logger.info("graph_pre_warmed")
     except Exception as e:
         logger.exception("graph_pre_warm_failed", error=str(e))
 
-    try:
-        await memory_service.initialize()
-    except Exception as e:
-        logger.exception("memory_service_pre_warm_failed", error=str(e))
+    # try:
+    #     await memory_service.initialize()
+    # except Exception as e:
+    #     logger.exception("memory_service_pre_warm_failed", error=str(e))
 
     yield
 
-    await cache_service.close()
+    # await cache_service.close()
     if agent._connection_pool:
         await agent._connection_pool.close()
         logger.info("connection_pool_closed")
@@ -111,7 +110,7 @@ app.add_middleware(LoggingContextMiddleware)
 
 
 # Add custom metrics middleware
-app.add_middleware(MetricsMiddleware)
+# app.add_middleware(MetricsMiddleware)
 
 
 # Add profiling middleware (DEBUG only — saves HTML to /tmp on slow requests)
@@ -184,10 +183,9 @@ async def root(request: Request):
         "redoc_url": "/redoc",
     }
 
-
 @app.get("/health")
 @limiter.limit(settings.RATE_LIMIT_ENDPOINTS["health"][0])
-async def health_check(db: db_dependency) -> JSONResponse:
+async def health_check(request: Request, db: db_dependency) -> JSONResponse:
     """Health check endpoint with environment-specific information.
 
     Returns:

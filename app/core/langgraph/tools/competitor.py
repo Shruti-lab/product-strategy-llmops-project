@@ -1,9 +1,14 @@
 from app.core.langgraph.tools.tavily import tavily_search
+from langchain_core.tools import tool
 
-
+@tool
 async def competitor_research(product: str) -> str:
     """
-    Gather competitor information.
+    Research competing products in the market.
+
+    Use this tool whenever competitor analysis is required.
+    Returns recent web information about competitors, pricing,
+    positioning, strengths, weaknesses, and product launches.
     """
 
     query = f"""

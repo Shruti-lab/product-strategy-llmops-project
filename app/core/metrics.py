@@ -4,7 +4,8 @@ This module sets up and configures Prometheus metrics for monitoring the applica
 """
 
 from prometheus_client import Counter, Histogram, Gauge
-from starlette_prometheus import metrics, PrometheusMiddleware
+# from starlette_prometheus import metrics, PrometheusMiddleware
+from prometheus_fastapi_instrumentator import Instrumentator
 
 # Request metrics
 http_requests_total = Counter("http_requests_total", "Total number of HTTP requests", ["method", "endpoint", "status"])
@@ -18,7 +19,6 @@ db_connections = Gauge("db_connections", "Number of active database connections"
 
 # Custom business metrics
 orders_processed = Counter("orders_processed_total", "Total number of orders processed")
-
 llm_inference_duration_seconds = Histogram(
     "llm_inference_duration_seconds",
     "Time spent processing LLM inference",
@@ -48,7 +48,8 @@ def setup_metrics(app):
         app: FastAPI application instance
     """
     # Add Prometheus middleware
-    app.add_middleware(PrometheusMiddleware)
+    # app.add_middleware(PrometheusMiddleware)
 
     # Add metrics endpoint
-    app.add_route("/metrics", metrics)
+    Instrumentator().instrument(app).expose(app)
+    # app.add_route("/metrics", metrics)

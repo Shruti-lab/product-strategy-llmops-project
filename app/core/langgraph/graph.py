@@ -5,13 +5,13 @@ from typing import AsyncGenerator, Optional, cast, TypedDict
 from urllib.parse import quote_plus
 
 from langchain_core.callbacks import BaseCallbackHandler
-from langchain_core.messages import (
-    AIMessage,
-    AIMessageChunk,
-    BaseMessage,
-    ToolMessage,
-    convert_to_openai_messages,
-)
+# from langchain_core.messages import (
+#     AIMessage,
+#     AIMessageChunk,
+#     BaseMessage,
+#     ToolMessage,
+#     convert_to_openai_messages,
+# )
 from langchain.agents import create_agent
 
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
@@ -19,17 +19,15 @@ from langgraph.errors import GraphInterrupt
 from langgraph.graph import END, START, StateGraph
 from langchain_core.runnables.config import RunnableConfig
 from langgraph.graph.state import (
-    Command,
     CompiledStateGraph,
 )
 
-from langgraph.types import (
-    RetryPolicy,
-    StateSnapshot,
-)
+# from langgraph.types import (
+#     RetryPolicy,
+#     StateSnapshot,
+# )
 from psycopg import (
     AsyncConnection,
-    sql,
 )
 from psycopg.rows import (
     DictRow,
@@ -41,25 +39,18 @@ from app.core.config import (
     Environment,
     settings,
 )
-from app.core.langgraph.tools import tools
+from app.core.langgraph.tools import research_tools
 
 from app.core.logging import logger
-from app.core.metrics import llm_inference_duration_seconds
+# from app.core.metrics import llm_inference_duration_seconds
 from app.core.observability import langfuse_callback_handler
-from app.core.prompts import load_system_prompt
 from app.services.llm.registry import LLMRegistry
 
 from app.schemas import ResearchOutput, AnalysisOutput, StrategyOutput, CritiqueOutput
 
 
 from app.services.llm import llm_service
-from app.services.memory import memory_service
-from app.utils import (
-    dump_messages,
-    extract_text_content,
-    prepare_messages,
-    process_llm_response,
-)
+
 
 PostgresConnPool = AsyncConnectionPool[AsyncConnection[DictRow]]
 
@@ -145,12 +136,7 @@ class LangGraphAgent:
 
         research_agent = create_agent(
             model=LLMRegistry.get_model("research_agent"),
-            tools=[
-                tavily_search,
-                news_search,
-                competitor_search,
-                market_research,
-            ],
+            tools=research_tools,
             response_format=ResearchOutput,
         )
 
@@ -232,6 +218,8 @@ class LangGraphAgent:
             {state["analysis"].model_dump_json()}
             """,
         )
+
+        logger.info()
 
         return {
             "strategy": result

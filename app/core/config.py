@@ -198,7 +198,7 @@ class Settings:
             "chat": ["30 per minute"],
             "chat_stream": ["20 per minute"],
             "messages": ["50 per minute"],
-            "register": ["10 per hour"],
+            "signup": ["10 per hour"],
             "login": ["20 per minute"],
             "root": ["10 per minute"],
             "health": ["20 per minute"],
@@ -213,10 +213,10 @@ class Settings:
                 self.RATE_LIMIT_ENDPOINTS[endpoint] = value
 
         # Evaluation Configuration
-        self.EVALUATION_LLM = os.getenv("EVALUATION_LLM", "gpt-5")
-        self.EVALUATION_BASE_URL = os.getenv("EVALUATION_BASE_URL", "https://api.openai.com/v1")
-        self.EVALUATION_API_KEY = os.getenv("EVALUATION_API_KEY", self.OPENAI_API_KEY)
-        self.EVALUATION_SLEEP_TIME = int(os.getenv("EVALUATION_SLEEP_TIME", "10"))
+        # self.EVALUATION_LLM = os.getenv("EVALUATION_LLM", "gpt-5")
+        # self.EVALUATION_BASE_URL = os.getenv("EVALUATION_BASE_URL", "https://api.openai.com/v1")
+        # self.EVALUATION_API_KEY = os.getenv("EVALUATION_API_KEY", self.OPENAI_API_KEY)
+        # self.EVALUATION_SLEEP_TIME = int(os.getenv("EVALUATION_SLEEP_TIME", "10"))
 
         # Apply environment-specific settings
         self.apply_environment_settings()

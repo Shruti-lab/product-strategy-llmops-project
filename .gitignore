@@ -5,6 +5,10 @@ middleware_rough.txt
 agents.txt
 project_u.txt
 database.txt
+auth-error.txt
+prom-fastapi-intrumentor-metrics.txt
+starlette-fastapi-metrics.txt
+
 
 __pycache__/
 *.py[oc]
