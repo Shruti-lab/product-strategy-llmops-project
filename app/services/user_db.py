@@ -13,6 +13,7 @@ from starlette import status
 
 from app.core.logging import logger
 from app.services.dependencies import db_dependency
+from app.schemas import Session
 from app.models.user import User
 from app.core.config import settings
 
@@ -31,10 +32,17 @@ def create_user(db: db_dependency, email: str, password):
         Returns:
             User: The created user
     """
+    existing_user = db.query(User).filter(User.email == email).first()
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="A user with this email already exists.",
+        )
+
     user = User(email=email,hashed_password=bcrypt_context.hash(password))
     db.add(user)
     db.commit()
-    db.refreshe(user)
+    db.refresh(user)
     logger.info("user_created", email=email)
     return user
 
@@ -90,7 +98,7 @@ def get_current_user(db: db_dependency, token: str = Depends(oauth2_bearer)) -> 
 
 
 
-def get_current_session(db: db_dependency,token: str = Depends(oauth2_bearer)) -> User:
+def get_current_session(db: db_dependency,token: str = Depends(oauth2_bearer)) -> Session:
     """
     Returns the currently authenticated user from the JWT.
     """
@@ -125,8 +133,13 @@ def get_current_session(db: db_dependency,token: str = Depends(oauth2_bearer)) -
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
+        print(f'This is user_db.py AND THIS IS SESSION ID: {session_id}')
 
-        return user
+        return {
+            "session_id":session_id,
+            "user_id":user_id,
+            "email":session_id
+        }
 
     except ValueError as ve:
         logger.exception("token_validation_failed", error=str(ve))

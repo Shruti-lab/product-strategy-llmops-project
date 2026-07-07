@@ -56,6 +56,14 @@ from app.core.middleware import (
 from app.core.observability import langfuse_init
 from app.services.dependencies import db_dependency
 
+# For tables creation
+from app.services.database import Base, engine
+
+# Import models
+from app.models.user import User
+from app.models.session import UserSession
+
+
 from sqlalchemy import text
 
 
@@ -72,6 +80,10 @@ async def lifespan(app: FastAPI):
         version=settings.VERSION,
         api_prefix=settings.API_V1_STR,
     )
+
+    # Create database tables
+    Base.metadata.create_all(bind=engine)
+    logger.info("database_tables_created")
 
     try:
         await agent.create_graph()
@@ -152,7 +164,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         formatted_errors.append({"field": loc, "message": error["msg"]})
 
     return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         content={"detail": "Validation error", "errors": formatted_errors},
     )
 

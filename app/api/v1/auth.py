@@ -30,7 +30,7 @@ from app.services.user_db import create_user, authenticate_user, create_access_t
 from app.services.dependencies import db_dependency
 
 
-router = APIRouter(prefix='/auth', tags=["auth"])
+router = APIRouter()
 
 
 @router.post("/signup")
@@ -59,4 +59,4 @@ def signin(request: Request,form_data: Annotated[OAuth2PasswordRequestForm, Depe
     user_id = user.id
     token = create_access_token(user_id, email)
 
-    return {"access_token": token, "token_type": "bearer"}
+    return {"token": token, "token_type": "bearer"}

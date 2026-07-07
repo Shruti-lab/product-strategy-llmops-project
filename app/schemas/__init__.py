@@ -3,6 +3,7 @@
 from app.schemas.user import UserCreate, TokenData
 
 from app.schemas.graph import ResearchOutput, AnalysisOutput, StrategyOutput, CritiqueOutput, WorkflowResponse, QueryRequest
+from app.schemas.session import SessionRequest
 
 __all__ = [
     "UserCreate",
@@ -12,5 +13,6 @@ __all__ = [
     "StrategyOutput", 
     "CritiqueOutput",
     "QueryRequest",
-    "WorkflowResponse"
+    "WorkflowResponse",
+    "SessionRequest"
 ]

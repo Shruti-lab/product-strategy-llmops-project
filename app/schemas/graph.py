@@ -71,6 +71,7 @@ class QueryRequest(BaseModel):
 
 class WorkflowResponse(BaseModel):
     success: bool
+    session_id: int
 
     research: ResearchOutput
     analysis: AnalysisOutput

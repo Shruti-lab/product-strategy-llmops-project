@@ -3,6 +3,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 
+# SQLAlchemy only creates tables for models that have been imported.
+
+
 
 from app.core.config import (
     Environment,
@@ -29,7 +32,6 @@ try:
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     
     Base = declarative_base()
-    Base.metadata.create_all(bind=engine)
     logger.info("database_initialized. Base ORM created", environment=settings.ENVIRONMENT.value)
         
 
