@@ -28,7 +28,7 @@ class LLMRegistry:
 
         "analyst": init_chat_model("groq:llama-3.3-70b-versatile",temperature=0),
 
-        "planner": init_chat_model("groq:llama-3.3-70b-versatile",temperature=0.2),
+        "strategy": init_chat_model("groq:llama-3.3-70b-versatile",temperature=0.2),
 
         "critic": init_chat_model("groq:llama-3.3-70b-versatile",temperature=0),
     }

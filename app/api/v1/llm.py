@@ -23,7 +23,7 @@ agent  = LangGraphAgent()
 
 @router.post("/query",response_model=WorkflowResponse,)
 @limiter.limit(settings.RATE_LIMIT_ENDPOINTS["chat"][0])
-async def generate_strategy(request: Request, body: QueryRequest, current_user:User = Depends(get_current_user), db: db_dependency):
+async def generate_strategy(request: Request, body: QueryRequest, db: db_dependency, current_user:User = Depends(get_current_user)):
     """
     Execute the Product Strategy LangGraph workflow.
     """
@@ -76,7 +76,7 @@ async def generate_strategy(request: Request, body: QueryRequest, current_user:U
 
 
 @router.get("/{session_id}")
-def get_session(session_id: int,current_user: User = Depends(get_current_user),db: db_dependency = Depends()):
+def get_session(session_id: int,db: db_dependency, current_user: User = Depends(get_current_user)):
     chat = (
     db.query(UserSession).filter(
           UserSession.id == session_id,

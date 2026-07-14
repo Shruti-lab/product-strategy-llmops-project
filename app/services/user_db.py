@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from typing import Annotated, Optional
 
 
+from app.schemas.session import SessionRequest
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
@@ -13,7 +14,7 @@ from starlette import status
 
 from app.core.logging import logger
 from app.services.dependencies import db_dependency
-from app.schemas import Session
+from app.schemas import SessionRequest
 from app.models.user import User
 from app.core.config import settings
 
@@ -98,59 +99,59 @@ def get_current_user(db: db_dependency, token: str = Depends(oauth2_bearer)) -> 
 
 
 
-def get_current_session(db: db_dependency,token: str = Depends(oauth2_bearer)) -> Session:
-    """
-    Returns the currently authenticated user from the JWT.
-    """
+# def get_current_session(db: db_dependency,token: str = Depends(oauth2_bearer)) -> SessionRequest:
+#     """
+#     Returns the currently authenticated user from the JWT.
+#     """
 
-    # credentials_exception = HTTPException(
-    #     status_code=status.HTTP_401_UNAUTHORIZED,
-    #     detail="Could not validate credentials",
-    #     headers={"WWW-Authenticate": "Bearer"},
-    # )
+#     # credentials_exception = HTTPException(
+#     #     status_code=status.HTTP_401_UNAUTHORIZED,
+#     #     detail="Could not validate credentials",
+#     #     headers={"WWW-Authenticate": "Bearer"},
+#     # )
 
-    try:
-        payload = jwt.decode(
-            token,
-            settings.JWT_SECRET_KEY,
-            algorithms=[settings.JWT_ALGORITHM],
-        )
+#     try:
+#         payload = jwt.decode(
+#             token,
+#             settings.JWT_SECRET_KEY,
+#             algorithms=[settings.JWT_ALGORITHM],
+#         )
 
-        session_id: str | None = payload.get("sub")
-        user_id: int | None = payload.get("id")
-        if session_id is None:
-            logger.error("session_id_not_found", token_part=token[:10] + "...")
-            raise HTTPException(
-                status_code=401,
-                detail="Invalid authentication credentials",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
+#         session_id: str | None = payload.get("sub")
+#         user_id: int | None = payload.get("id")
+#         if session_id is None:
+#             logger.error("session_id_not_found", token_part=token[:10] + "...")
+#             raise HTTPException(
+#                 status_code=401,
+#                 detail="Invalid authentication credentials",
+#                 headers={"WWW-Authenticate": "Bearer"},
+#             )
         
-        user = db.query(User).filter(User.email == session_id).first()
-        if user is None:
-            raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-        print(f'This is user_db.py AND THIS IS SESSION ID: {session_id}')
+#         user = db.query(User).filter(User.email == session_id).first()
+#         if user is None:
+#             raise HTTPException(
+#             status_code=status.HTTP_401_UNAUTHORIZED,
+#             detail="Could not validate credentials",
+#             headers={"WWW-Authenticate": "Bearer"},
+#         )
+#         print(f'This is user_db.py AND THIS IS SESSION ID: {session_id}')
 
-        return {
-            "session_id":session_id,
-            "user_id":user_id,
-            "email":session_id
-        }
+#         return {
+#             "session_id":session_id,
+#             "user_id":user_id,
+#             "email":session_id
+#         }
 
-    except ValueError as ve:
-        logger.exception("token_validation_failed", error=str(ve))
-        raise HTTPException(
-            status_code=422,
-            detail="Invalid token format",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    except JWTError:
-        raise HTTPException(
-            status_code=401,
-            detail="Could not validate credentials. Invalid or expired or missing token.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+#     except ValueError as ve:
+#         logger.exception("token_validation_failed", error=str(ve))
+#         raise HTTPException(
+#             status_code=422,
+#             detail="Invalid token format",
+#             headers={"WWW-Authenticate": "Bearer"},
+#         )
+#     except JWTError:
+#         raise HTTPException(
+#             status_code=401,
+#             detail="Could not validate credentials. Invalid or expired or missing token.",
+#             headers={"WWW-Authenticate": "Bearer"},
+#         )

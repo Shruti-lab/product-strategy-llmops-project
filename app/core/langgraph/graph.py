@@ -135,7 +135,7 @@ class LangGraphAgent:
     async def research_node(self,state: GraphState) -> dict:
 
         research_agent = create_agent(
-            model=LLMRegistry.get_model("research_agent"),
+            model=LLMRegistry.get_model("research"),
             tools=research_tools,
             response_format=ResearchOutput,
         )
@@ -180,7 +180,7 @@ class LangGraphAgent:
 
     async def analysis_node(self,state: GraphState) -> dict:
 
-        llm = LLMRegistry.get_model("analyst_agent")
+        llm = LLMRegistry.get_model("analyst")
 
         structured_llm = llm.with_structured_output(
             AnalysisOutput
@@ -203,7 +203,7 @@ class LangGraphAgent:
     
     async def strategy_node(self,state: GraphState) -> dict:
 
-        llm = LLMRegistry.get_model("strategy_agent")
+        llm = LLMRegistry.get_model("strategy")
 
         structured_llm = llm.with_structured_output(
             StrategyOutput
@@ -228,7 +228,7 @@ class LangGraphAgent:
 
     async def critique_node(self, state: GraphState) -> dict:
 
-        llm = LLMRegistry.get_model("critic_agent")
+        llm = LLMRegistry.get_model("critic")
 
         structured_llm = llm.with_structured_output(
             CritiqueOutput

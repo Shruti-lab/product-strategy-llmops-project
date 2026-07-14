@@ -60,8 +60,7 @@ from app.services.dependencies import db_dependency
 from app.services.database import Base, engine
 
 # Import models
-from app.models.user import User
-from app.models.session import UserSession
+from app.models import User, UserSession
 
 
 from sqlalchemy import text
