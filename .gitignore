@@ -8,6 +8,7 @@ database.txt
 auth-error.txt
 prom-fastapi-intrumentor-metrics.txt
 starlette-fastapi-metrics.txt
+local_db_fix.txt
 
 
 __pycache__/
@@ -33,3 +34,5 @@ venv/
 
 # Reports
 evals/reports/
+
+*.md
